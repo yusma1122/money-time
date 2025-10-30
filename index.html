@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Nilai Waktu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    * { 
+      font-family: 'Inter', sans-serif; 
+      -webkit-font-smoothing: antialiased;
+    }
+    .input-focus:focus { 
+      outline: none; 
+      border-color: #3b82f6; 
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+    }
+    .fade-in { 
+      animation: fadeIn 0.3s ease-out; 
+    }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(8px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    #headerQuoteText, #headerQuoteAuthor {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .quote-fade-out {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    .quote-fade-in {
+      animation: quoteFadeIn 0.5s ease forwards;
+    }
+    @keyframes quoteFadeIn {
+      from { 
+        opacity: 0; 
+        transform: translateX(10px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateX(0); 
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8 px-4 sm:py-12">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl font-semibold text-gray-900 mb-2">Kalkulator Nilai Waktu</h1>
+      <p class="text-gray-600 mb-4">Hitung nilai waktumu dan jam kerja untuk sebuah pembelian</p>
+      
+      <!-- Quote Carousel -->
+      <div class="max-w-2xl mx-auto bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+        <div class="flex items-center justify-between gap-3">
+          <button onclick="previousQuote()" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+            <i class="fas fa-chevron-left text-sm"></i>
+          </button>
+          <div class="flex-1 min-w-0">
+            <p id="headerQuoteText" class="text-sm text-gray-700 italic mb-1 leading-relaxed"></p>
+            <p id="headerQuoteAuthor" class="text-xs text-gray-500 font-medium"></p>
+          </div>
+          <button onclick="nextQuote()" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+            <i class="fas fa-chevron-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Card -->
+    <main class="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div class="p-6 sm:p-8">
+        
+        <!-- Input Form -->
+        <section class="mb-8">
+          <div class="space-y-5">
+            
+            <!-- Gaji -->
+            <div>
+              <label for="salary" class="block text-sm font-medium text-gray-700 mb-1.5">
+                Gaji Bulanan (Rp)
+              </label>
+              <input 
+                id="salary" 
+                type="text" 
+                class="w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-md input-focus transition-shadow" 
+                placeholder="-" 
+                oninput="formatNumber(this)"
+              >
+            </div>
+
+            <!-- Biaya -->
+            <div>
+              <label for="costs" class="block text-sm font-medium text-gray-700 mb-1.5">
+                Biaya Kerja per Bulan (Rp)
+              </label>
+              <input 
+                id="costs" 
+                type="text" 
+                class="w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-md input-focus transition-shadow" 
+                placeholder="-" 
+                oninput="formatNumber(this)"
+              >
+              <p class="text-xs text-gray-500 mt-1.5">Transport, makan, parkir, dll.</p>
+            </div>
+
+            <!-- Hari & Jam -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="daysPerWeek" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Hari/Minggu
+                </label>
+                <input 
+                  id="daysPerWeek" 
+                  type="number" 
+                  class="w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-md input-focus transition-shadow" 
+                  placeholder="6" 
+                  value="6"
+                >
+              </div>
+              <div>
+                <label for="hoursPerDay" class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Jam/Hari
+                </label>
+                <input 
+                  id="hoursPerDay" 
+                  type="number" 
+                  class="w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-md input-focus transition-shadow" 
+                  placeholder="7" 
+                  value="7"
+                >
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="pt-2 pb-1 border-t border-gray-200"></div>
+
+            <!-- Harga Barang -->
+            <div>
+              <label for="itemPrice" class="block text-sm font-medium text-gray-700 mb-1.5">
+                Harga Barang (Rp)
+              </label>
+              <input 
+                id="itemPrice" 
+                type="text" 
+                class="w-full px-4 py-2.5 text-gray-900 border border-gray-300 rounded-md input-focus transition-shadow" 
+                placeholder="3.000.000" 
+                oninput="formatNumber(this)"
+              >
+            </div>
+
+            <!-- Button -->
+            <button 
+              onclick="calculate()" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-md transition-colors"
+            >
+              Hitung
+            </button>
+          </div>
+        </section>
+
+        <!-- Results -->
+        <section id="resultSection" class="hidden fade-in">
+          <div class="pt-6 border-t border-gray-200">
+            
+            <!-- Stats Grid -->
+            <div class="grid sm:grid-cols-3 gap-4 mb-6">
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-600 mb-1">Nilai Per Jam</p>
+                <p id="hourlyWage" class="text-xl font-semibold text-gray-900"></p>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-600 mb-1">Penghasilan Bersih</p>
+                <p id="netIncome" class="text-xl font-semibold text-gray-900"></p>
+              </div>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-xs font-medium text-gray-600 mb-1">Jam Kerja/Bulan</p>
+                <p id="monthlyHours" class="text-xl font-semibold text-gray-900"></p>
+              </div>
+            </div>
+
+            <!-- Item Analysis -->
+            <div id="itemAnalysis" class="hidden bg-blue-50 rounded-lg p-5 border border-blue-100">
+              <p class="text-sm font-medium text-gray-900 mb-4">Untuk membeli barang ini, kamu perlu:</p>
+              
+              <div class="space-y-3 mb-5">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-700">Jam kerja</span>
+                  <span id="workHours" class="font-semibold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-700">Hari kerja</span>
+                  <span id="workDays" class="font-semibold text-gray-900"></span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                  <span class="text-gray-700">Minggu kerja</span>
+                  <span id="workWeeks" class="font-semibold text-gray-900"></span>
+                </div>
+              </div>
+
+              <div class="pt-4 border-t border-blue-100">
+                <div class="flex justify-between items-center mb-2.5">
+                  <span class="text-xs font-medium text-gray-700">Persentase dari gaji</span>
+                  <span id="salaryPercent" class="text-sm font-semibold text-gray-900"></span>
+                </div>
+                <div class="w-full bg-white rounded-full h-2 overflow-hidden">
+                  <div id="salaryPercentBar" class="h-full bg-blue-600 transition-all duration-500"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Insight -->
+            <div id="insightCard" class="mt-4 p-4 rounded-lg border hidden">
+              <div class="flex gap-3">
+                <i id="insightIcon" class="text-lg mt-0.5 flex-shrink-0"></i>
+                <p id="insightText" class="text-sm text-gray-700 leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Quote Card -->
+    <div id="quoteCard" class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hidden fade-in">
+      <i class="fas fa-quote-left text-2xl text-gray-300 mb-3"></i>
+      <p id="quoteText" class="text-gray-700 italic mb-2 text-base leading-relaxed"></p>
+      <p id="quoteAuthor" class="text-sm text-gray-500 font-medium"></p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center mt-8 space-y-4">
+      <p class="text-sm text-gray-500">Gunakan kalkulator ini untuk membuat keputusan finansial yang lebih baik</p>
+      
+      <!-- Developer Info -->
+      <div class="pt-4 border-t border-gray-200">
+        <p class="text-sm text-gray-700 font-medium mb-2">Developed by Yusma Rahman</p>
+        <p class="text-xs text-gray-500 mb-3">Junior Web Developer</p>
+        <div class="flex items-center justify-center gap-4">
+          <a href="https://www.instagram.com/yusmafrlnc/" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-pink-600 transition-colors">
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+          <a href="https://github.com/yusma1122" target="_blank" rel="noopener noreferrer" class="text-gray-600 hover:text-gray-900 transition-colors">
+            <i class="fab fa-github text-xl"></i>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Quote collection related to time, money, and value
+    const quotes = [
+      { text: "Waktu adalah uang yang paling berharga, karena tidak bisa dibeli kembali", author: "Benjamin Franklin" },
+      { text: "Jangan habiskan uangmu sebelum kamu mendapatkannya", author: "Thomas Jefferson" },
+      { text: "Harga adalah apa yang kamu bayar. Nilai adalah apa yang kamu dapatkan", author: "Warren Buffett" },
+      { text: "Kekayaan bukanlah tentang memiliki banyak uang, tetapi tentang memiliki banyak pilihan", author: "Chris Rock" },
+      { text: "Investasi terbaik adalah investasi pada diri sendiri", author: "Warren Buffett" },
+      { text: "Cara terbaik memprediksi masa depan adalah dengan menciptakannya", author: "Peter Drucker" },
+      { text: "Jangan simpan apa yang tersisa setelah berbelanja, tapi belanjakan apa yang tersisa setelah menabung", author: "Warren Buffett" },
+      { text: "Uang hanyalah alat. Ia akan membawamu ke mana pun kamu mau, tapi tidak akan menggantikanmu sebagai pengemudi", author: "Ayn Rand" },
+      { text: "Seseorang duduk di bawah bayangan pohon hari ini karena seseorang menanam pohon itu dulu", author: "Warren Buffett" },
+      { text: "Kemewahan sejati adalah memiliki waktu untuk melakukan apa yang kamu inginkan", author: "Naval Ravikant" },
+      { text: "Kebebasan finansial bukan tentang menjadi kaya, tapi tentang memiliki kendali atas waktumu sendiri", author: "Vicki Robin" },
+      { text: "Ketika kamu membeli sesuatu yang tidak kamu butuhkan, kamu mencuri dari masa depanmu sendiri", author: "Dave Ramsey" },
+      { text: "Tujuan akhir dari bekerja keras bukanlah lebih banyak uang, tapi lebih banyak waktu untuk hidup", author: "Unknown" },
+      { text: "Sadarilah bahwa setiap rupiah yang kamu keluarkan adalah hasil pertukaran dari waktumu yang tak tergantikan", author: "Your Money or Your Life" },
+      { text: "Orang miskin bekerja untuk uang, orang kaya membuat uang bekerja untuk mereka", author: "Robert Kiyosaki" },
+      { text: "Satu-satunya hal yang lebih penting dari uang adalah waktu, karena waktu tidak bisa diulang", author: "Jim Rohn" },
+      { text: "Hidup sederhana bukan berarti kekurangan, tapi berarti kamu cukup", author: "Vicki Robin" },
+      { text: "Pengeluaran kecil yang tidak disadari adalah kebocoran terbesar dalam keuangan seseorang", author: "Benjamin Franklin" },
+      { text: "Setiap keputusan finansial adalah refleksi dari nilai-nilai hidupmu", author: "Vicki Robin" },
+      { text: "Tujuan dari uang bukanlah memiliki lebih banyak, tetapi memiliki cukup untuk hidup dengan damai", author: "Unknown" },
+      { text: "Waktu dan energi adalah mata uang sejati kehidupan", author: "Alan Cohen" },
+      { text: "Menjadi kaya adalah memiliki uang; menjadi makmur adalah memiliki waktu", author: "Margaret Bonnano" },
+      { text: "Kebebasan sejati adalah saat kamu tidak lagi harus menukar waktu untuk uang", author: "Naval Ravikant" },
+      { text: "Jangan biarkan uang menjadi alasanmu kehilangan kehidupan", author: "Vicki Robin" },
+      { text: "Hidup dengan sadar terhadap uang membuatmu lebih kaya, bahkan sebelum saldo rekeningmu bertambah", author: "Your Money or Your Life" },
+      { text: "Kamu tidak bisa membeli waktu, tapi kamu bisa mengatur bagaimana kamu menggunakannya.", author: "Unknown" },
+      { text: "Jika kamu tidak mengatur uangmu, uangmu akan mengaturmu.", author: "Dave Ramsey" },
+      { text: "Kaya bukan tentang berapa banyak uang yang kamu hasilkan, tapi berapa banyak yang bisa kamu simpan.", author: "Robert Kiyosaki" },
+      { text: "Setiap rupiah yang kamu keluarkan adalah suara untuk jenis dunia yang kamu inginkan.", author: "Anna Lappé" },
+      { text: "Kamu bisa memiliki segalanya, tapi tidak dalam waktu yang bersamaan.", author: "Oprah Winfrey" },
+      { text: "Sukses sejati adalah ketika kamu bisa bangun pagi tanpa alarm dan tetap bahagia.", author: "Naval Ravikant" },
+      { text: "Kamu tidak harus menjadi luar biasa untuk memulai, tapi kamu harus memulai untuk menjadi luar biasa.", author: "Zig Ziglar" },
+      { text: "Jangan bekerja keras untuk membeli barang yang kamu tidak butuhkan, untuk mengesankan orang yang bahkan tidak kamu kenal.", author: "Unknown" },
+      { text: "Kamu bisa mendapatkan lebih banyak uang, tapi tidak lebih banyak waktu.", author: "Jim Rohn" },
+      { text: "Mereka yang memahami bunga majemuk, menerimanya; mereka yang tidak, membayarnya.", author: "Albert Einstein" },
+      { text: "Jangan kejar uang, kejar kebebasan yang uang bisa berikan.", author: "Vicki Robin" },
+      { text: "Setiap pembelian adalah keputusan antara hari ini dan masa depanmu.", author: "Your Money or Your Life" },
+      { text: "Belajarlah mengatakan 'tidak' pada hal-hal kecil, agar kamu bisa berkata 'ya' pada hal-hal besar.", author: "Warren Buffett" },
+      { text: "Kamu tidak kekurangan waktu, kamu hanya tidak menggunakannya dengan bijak.", author: "Seneca" },
+      { text: "Lebih banyak bukan selalu lebih baik; cukup adalah titik kebahagiaan sejati.", author: "Vicki Robin" },
+      { text: "Waktu adalah aset yang paling langka. Gunakan dengan orang dan tujuan yang membuatmu tumbuh.", author: "Unknown" },
+      { text: "Kamu tidak bisa mengalahkan sistem finansial sampai kamu sadar kamu adalah bagiannya.", author: "Joe Dominguez" },
+      { text: "Kesederhanaan bukan berarti kehilangan, tapi menemukan nilai dari apa yang tersisa.", author: "Vicki Robin" },
+      { text: "Ketika kamu tahu berapa nilai waktumu, kamu berhenti menjualnya dengan murah.", author: "Naval Ravikant" },
+      { text: "Kamu tidak butuh lebih banyak hal; kamu butuh lebih banyak ruang untuk bernapas.", author: "Unknown" },
+      { text: "Kebebasan bukan berarti tidak bekerja, tapi punya pilihan bagaimana dan kapan kamu bekerja.", author: "Tim Ferriss" },
+      { text: "Hidup minimalis bukan tentang kekurangan, tapi tentang kejelasan.", author: "Joshua Becker" },
+      { text: "Uang adalah cermin: ia hanya memperbesar siapa dirimu sebenarnya.", author: "Suze Orman" },
+      { text: "Tujuan keuangan sejati bukanlah kaya, tapi tenang.", author: "Morgan Housel" },
+      { text: "Ketika kamu berhenti mengejar uang, kamu mulai mengejar kehidupan.", author: "Unknown" },
+    ];
+
+    let currentQuoteIndex = 0;
+    let usedQuotes = [];
+
+    function updateHeaderQuote() {
+  const quoteText = document.getElementById("headerQuoteText");
+  const quoteAuthor = document.getElementById("headerQuoteAuthor");
+  
+  // Fade out
+  quoteText.classList.add("quote-fade-out");
+  quoteAuthor.classList.add("quote-fade-out");
+  
+  setTimeout(() => {
+    // GANTI BAGIAN INI - Generate random index
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * quotes.length);
+    } while (randomIndex === currentQuoteIndex && quotes.length > 1);
+    
+    currentQuoteIndex = randomIndex;
+    const quote = quotes[currentQuoteIndex];
+    
+    quoteText.innerText = `"${quote.text}"`;
+    quoteAuthor.innerText = `— ${quote.author}`;
+    
+    // Fade in
+    quoteText.classList.remove("quote-fade-out");
+    quoteAuthor.classList.remove("quote-fade-out");
+    quoteText.classList.add("quote-fade-in");
+    quoteAuthor.classList.add("quote-fade-in");
+    
+    setTimeout(() => {
+      quoteText.classList.remove("quote-fade-in");
+      quoteAuthor.classList.remove("quote-fade-in");
+    }, 500);
+  }, 300);
+}
+
+   function nextQuote() {
+      updateHeaderQuote(); // Sekarang akan random
+    }
+    
+    function previousQuote() {
+      updateHeaderQuote(); // Sekarang akan random juga
+    }
+
+    function getRandomQuote() {
+      return quotes[Math.floor(Math.random() * quotes.length)];
+    }
+
+    function showQuote() {
+      const quote = getRandomQuote();
+      document.getElementById("quoteText").innerText = `"${quote.text}"`;
+      document.getElementById("quoteAuthor").innerText = `— ${quote.author}`;
+      document.getElementById("quoteCard").classList.remove("hidden");
+    }
+
+    // Initialize header quote on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateHeaderQuote();
+      // Auto rotate quotes every 8 seconds
+      setInterval(nextQuote, 8000);
+    });
+
+    function formatNumber(input) {
+      let value = input.value.replace(/\D/g, "");
+      if (value === "") {
+        input.value = "";
+        return;
+      }
+      input.value = parseInt(value).toLocaleString("id-ID");
+    }
+
+    function calculate() {
+      const salary = parseInt(document.getElementById("salary").value.replace(/\./g, "")) || 0;
+      const costs = parseInt(document.getElementById("costs").value.replace(/\./g, "")) || 0;
+      const daysPerWeek = parseFloat(document.getElementById("daysPerWeek").value);
+      const hoursPerDay = parseFloat(document.getElementById("hoursPerDay").value);
+      const itemPrice = parseInt(document.getElementById("itemPrice").value.replace(/\./g, "")) || 0;
+
+      if (!salary || !daysPerWeek || !hoursPerDay) {
+        alert("Mohon isi semua data penghasilan dengan benar!");
+        return;
+      }
+
+      const netIncome = salary - costs;
+      const weeklyHours = daysPerWeek * hoursPerDay;
+      const monthlyHours = weeklyHours * 4.33;
+      const hourlyWage = netIncome / monthlyHours;
+
+      // Show results
+      document.getElementById("resultSection").classList.remove("hidden");
+
+      // Show random quote
+      showQuote();
+
+      // Display stats
+      document.getElementById("hourlyWage").innerText = `Rp ${Math.round(hourlyWage).toLocaleString('id-ID')}`;
+      document.getElementById("netIncome").innerText = `Rp ${netIncome.toLocaleString('id-ID')}`;
+      document.getElementById("monthlyHours").innerText = `${monthlyHours.toFixed(0)} jam`;
+
+      // Item analysis
+      if (itemPrice > 0) {
+        const hoursForItem = itemPrice / hourlyWage;
+        const daysForItem = hoursForItem / hoursPerDay;
+        const weeksForItem = daysForItem / daysPerWeek;
+        const salaryPercent = (itemPrice / salary) * 100;
+
+        document.getElementById("itemAnalysis").classList.remove("hidden");
+        document.getElementById("workHours").innerText = `${hoursForItem.toFixed(1)} jam`;
+        document.getElementById("workDays").innerText = `${daysForItem.toFixed(1)} hari`;
+        document.getElementById("workWeeks").innerText = `${weeksForItem.toFixed(1)} minggu`;
+        document.getElementById("salaryPercent").innerText = `${salaryPercent.toFixed(1)}%`;
+
+        // Progress bar
+        document.getElementById("salaryPercentBar").style.width = `${Math.min(salaryPercent, 100)}%`;
+
+        // Generate insight
+        generateInsight(salaryPercent, daysForItem);
+      } else {
+        document.getElementById("itemAnalysis").classList.add("hidden");
+        document.getElementById("insightCard").classList.add("hidden");
+      }
+
+      // Smooth scroll
+      setTimeout(() => {
+        document.getElementById("resultSection").scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    function generateInsight(salaryPercent, daysForItem) {
+      const insightCard = document.getElementById("insightCard");
+      const insightIcon = document.getElementById("insightIcon");
+      const insightText = document.getElementById("insightText");
+
+      let insight = "";
+      let iconClass = "";
+      let borderColor = "";
+      let bgColor = "";
+
+      if (salaryPercent < 10) {
+        insight = `Pembelian ini relatif terjangkau (${salaryPercent.toFixed(1)}% dari gaji). Kamu hanya perlu bekerja ${daysForItem.toFixed(1)} hari untuk mendapatkannya.`;
+        iconClass = "fas fa-circle-check text-green-600";
+        borderColor = "border-green-200";
+        bgColor = "bg-green-50";
+      } else if (salaryPercent < 30) {
+        insight = `Pembelian ini cukup signifikan (${salaryPercent.toFixed(1)}% dari gaji). Pertimbangkan apakah barang ini benar-benar memberikan nilai setara dengan ${daysForItem.toFixed(1)} hari kerjamu.`;
+        iconClass = "fas fa-circle-exclamation text-amber-600";
+        borderColor = "border-amber-200";
+        bgColor = "bg-amber-50";
+      } else if (salaryPercent < 50) {
+        insight = `Ini adalah pembelian besar (${salaryPercent.toFixed(1)}% dari gaji). Pastikan ini adalah investasi yang tepat atau sangat kamu butuhkan.`;
+        iconClass = "fas fa-triangle-exclamation text-orange-600";
+        borderColor = "border-orange-200";
+        bgColor = "bg-orange-50";
+      } else {
+        insight = `Peringatan! Ini akan menghabiskan ${salaryPercent.toFixed(1)}% dari gajimu. Pertimbangkan untuk menabung terlebih dahulu atau mencari alternatif yang lebih terjangkau.`;
+        iconClass = "fas fa-circle-xmark text-red-600";
+        borderColor = "border-red-200";
+        bgColor = "bg-red-50";
+      }
+
+      insightIcon.className = iconClass + " text-lg mt-0.5 flex-shrink-0";
+      insightText.innerText = insight;
+      insightCard.className = `mt-4 p-4 rounded-lg border ${borderColor} ${bgColor} fade-in`;
+      insightCard.classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
